@@ -1,0 +1,7 @@
+{
+  "PORT": 80,
+  "SMTP_PORT": 25,
+  "SMTP_HOST": "0.0.0.0",
+  "MAX_MAILS": 50,
+  "MAIL_EXPIRE_MINUTES": 10
+}

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>关于 MeteorMail</title>
+  <meta name="keywords" content="十分钟邮箱, 临时邮箱, 临时邮件, 一次性邮箱, 匿名邮箱, 邮箱接码, 邮箱验证码, 邮箱临时接收, 临时电子邮件, 临时邮箱平台, 临时邮箱服务, 10分钟邮箱, 10min mail, temp mail, disposable email, email verification" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/meteormail.css">
+  <script>
+    // 动态设置基础URL
+    const baseUrl = window.location.origin;
+
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = baseUrl + '/' + src;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    }
+
+    // 立即加载共享脚本
+    loadScript('js/meteor-effects.js')
+      .then(() => loadScript('js/translations.js'))
+      .catch(err => console.error('脚本加载失败:', err));
+
+    // 防止页面滚动问题
+    document.addEventListener('touchmove', function(e) {
+      if(e.target.closest('.overflow-y-auto, .overflow-x-auto')) {
+        return;
+      }
+      if(!e.target.closest('[data-allow-scroll="true"]')) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+  </script>
+</head>
+<body class="galaxy-bg text-gray-100 antialiased overflow-x-hidden">
+  <!-- 星星背景 -->
+  <div id="stars-container"></div>
+
+  <!-- 流星容器 -->
+  <div class="meteor-container" id="meteor-container"></div>
+
+  <!-- 页面容器 -->
+  <div class="min-h-screen flex flex-col relative z-10">
+    <!-- 顶部导航 -->
+    <header class="sticky top-0 z-30 backdrop-filter backdrop-blur-lg w-full" style="background: var(--header-bg); border-bottom: 1px solid var(--header-border);">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="flex justify-between items-center py-3 md:py-4">
+          <!-- Logo -->
+          <div class="flex items-center">
+            <a href="/" class="flex items-center" aria-label="MeteorMail">
+              <svg class="w-8 h-8 md:w-10 md:h-10" style="color: var(--primary);" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2"/>
+                <path d="M18 7L14 14L8 9L6 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span class="ml-2 text-xl md:text-2xl font-bold brand-font" style="color: var(--text-primary);">MeteorMail</span>
+            </a>
+          </div>
+
+          <!-- 导航链接 -->
+          <nav class="flex items-center space-x-1 sm:space-x-3">
+            <a href="/" class="font-medium px-2 py-1 rounded-md transition hover:bg-opacity-20 hover:bg-indigo-600" style="color: var(--text-secondary);" data-i18n="nav_home">首页</a>
+            <a href="/about.html" class="px-2 py-1 rounded-md transition hover:bg-opacity-20 hover:bg-indigo-600" style="color: var(--text-primary);" data-i18n="nav_about">关于</a>
+            <button id="langToggle" class="p-2 rounded-full transition focus:outline-none hover:opacity-80" style="background-color: var(--button-bg);" aria-label="切换语言" title="切换语言">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" style="color: var(--button-text);" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M7 2a1 1 0 011 1v1h3a1 1 0 110 2H9.578a18.87 18.87 0 01-1.724 4.78c.29.354.596.696.914 1.026a1 1 0 11-1.44 1.389 16.87 16.87 0 01-.554-.514 19.05 19.05 0 01-3.107 3.567 1 1 0 01-1.334-1.49 17.054 17.054 0 003.07-3.293 18.013 18.013 0 01-1.487-2.594 1 1 0 111.79-.894c.234.47.489.928.764 1.372.417-.934.752-1.913.997-2.927H3a1 1 0 110-2h3V3a1 1 0 011-1zm6 6a1 1 0 01.894.553l2.991 5.982a.869.869 0 01.02.037l.99 1.98a1 1 0 11-1.79.895L15.383 16h-4.764l-.724 1.447a1 1 0 11-1.788-.894l.99-1.98.019-.038 2.99-5.982A1 1 0 0113 8zm-1.382 6h2.764L13 11.236 11.618 14z" clip-rule="evenodd" />
+              </svg>
+            </button>
+            <button id="darkToggle" class="p-2 rounded-full transition ml-1 focus:outline-none hover:opacity-80" style="background-color: var(--button-bg);" aria-label="切换深色模式" title="切换深色模式">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" style="color: var(--button-text);" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+              </svg>
+            </button>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-10 overflow-x-hidden">
+      <!-- 主卡片 -->
+      <div class="glass-card mb-6 sm:mb-10 p-6 sm:p-8">
+        <h1 class="text-3xl font-bold mb-6 text-center" style="color: var(--text-primary);" data-i18n="about_title">关于 MeteorMail</h1>
+
+        <div class="mb-8">
+          <h2 class="text-xl font-semibold mb-3" style="color: var(--text-primary);" data-i18n="about_intro_title">项目介绍</h2>
+          <p class="mb-4" style="color: var(--text-secondary);" data-i18n="about_intro_text1">
+            MeteorMail 是一个基于 Node.js 的自托管临时邮箱服务，如同流星划过夜空般短暂绚丽。
+            它为用户提供即时创建、即用即走的临时邮箱，帮助保护您的隐私，避免垃圾邮件，同时满足各类验证码接收需求。
+          </p>
+          <p style="color: var(--text-secondary);" data-i18n="about_intro_text2">
+            项目完全开源，您可以在自己的服务器上部署，掌握数据控制权，无需依赖第三方服务。
+          </p>
+        </div>
+
+        <div class="mb-8">
+          <h2 class="text-xl font-semibold mb-3" style="color: var(--text-primary);" data-i18n="about_features_title">核心特性</h2>
+          <ul class="list-disc list-inside space-y-2" style="color: var(--text-secondary);">
+            <li><span class="font-medium" style="color: var(--primary);" data-i18n="about_feature1_title">WebSocket 实时推送</span> - <span data-i18n="about_feature1_desc">邮件到达时立即显示，无需刷新页面</span></li>
+            <li><span class="font-medium" style="color: var(--primary);" data-i18n="about_feature2_title">自动过期机制</span> - <span data-i18n="about_feature2_desc">邮件在设定时间后自动删除，增强隐私保护</span></li>
+            <li><span class="font-medium" style="color: var(--primary);" data-i18n="about_feature3_title">直观界面</span> - <span data-i18n="about_feature3_desc">简洁现代的用户界面，支持深色模式</span></li>
+            <li><span class="font-medium" style="color: var(--primary);" data-i18n="about_feature4_title">完整API</span> - <span data-i18n="about_feature4_desc">提供REST API接口方便程序化调用</span></li>
+            <li><span class="font-medium" style="color: var(--primary);" data-i18n="about_feature5_title">HTML邮件支持</span> - <span data-i18n="about_feature5_desc">完整渲染HTML格式邮件</span></li>
+            <li><span class="font-medium" style="color: var(--primary);" data-i18n="about_feature6_title">附件查看</span> - <span data-i18n="about_feature6_desc">支持接收和查看邮件附件</span></li>
+            <li><span class="font-medium" style="color: var(--primary);" data-i18n="about_feature7_title">自定义邮箱ID</span> - <span data-i18n="about_feature7_desc">允许用户自定义邮箱前缀</span></li>
+          </ul>
+        </div>
+
+        <div class="mb-8">
+          <h2 class="text-xl font-semibold mb-3" style="color: var(--text-primary);" data-i18n="about_usecases_title">使用场景</h2>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="glass-card p-4">
+              <div class="flex items-center mb-2">
+                <i class="fa-solid fa-shield-halved mr-2" style="color: var(--primary);"></i>
+                <h3 class="font-medium" style="color: var(--text-primary);" data-i18n="about_usecase1_title">保护隐私</h3>
+              </div>
+              <p class="text-sm" style="color: var(--text-secondary);" data-i18n="about_usecase1_desc">
+                注册不常用的网站或服务时使用临时邮箱，避免个人邮箱泄露带来的垃圾邮件风险。
+              </p>
+            </div>
+
+            <div class="glass-card p-4">
+              <div class="flex items-center mb-2">
+                <i class="fa-solid fa-code mr-2" style="color: var(--primary);"></i>
+                <h3 class="font-medium" style="color: var(--text-primary);" data-i18n="about_usecase2_title">开发测试</h3>
+              </div>
+              <p class="text-sm" style="color: var(--text-secondary);" data-i18n="about_usecase2_desc">
+                开发者测试需要邮箱验证的功能，无需创建多个真实邮箱账号。
+              </p>
+            </div>
+
+            <div class="glass-card p-4">
+              <div class="flex items-center mb-2">
+                <i class="fa-solid fa-robot mr-2" style="color: var(--primary);"></i>
+                <h3 class="font-medium" style="color: var(--text-primary);" data-i18n="about_usecase3_title">自动化流程</h3>
+              </div>
+              <p class="text-sm" style="color: var(--text-secondary);" data-i18n="about_usecase3_desc">
+                通过API集成到自动化流程中，实现自动接收验证码和邮件处理。
+              </p>
+            </div>
+
+            <div class="glass-card p-4">
+              <div class="flex items-center mb-2">
+                <i class="fa-solid fa-graduation-cap mr-2" style="color: var(--primary);"></i>
+                <h3 class="font-medium" style="color: var(--text-primary);" data-i18n="about_usecase4_title">教育演示</h3>
+              </div>
+              <p class="text-sm" style="color: var(--text-secondary);" data-i18n="about_usecase4_desc">
+                在教学场景中演示邮件系统工作原理，无需设置复杂的邮件服务器。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <h2 class="text-xl font-semibold mb-3" style="color: var(--text-primary);" data-i18n="about_tech_title">技术架构</h2>
+          <div class="glass-card p-4 mb-4">
+            <h3 class="font-medium mb-2" style="color: var(--text-primary);" data-i18n="about_backend_title">后端技术</h3>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-2 py-1 rounded text-sm" style="background-color: rgba(79, 70, 229, 0.2); color: var(--primary);">Node.js</span>
+              <span class="px-2 py-1 rounded text-sm" style="background-color: rgba(79, 70, 229, 0.2); color: var(--primary);">Express</span>
+              <span class="px-2 py-1 rounded text-sm" style="background-color: rgba(79, 70, 229, 0.2); color: var(--primary);">Socket.IO</span>
+              <span class="px-2 py-1 rounded text-sm" style="background-color: rgba(79, 70, 229, 0.2); color: var(--primary);">SMTP Server</span>
+              <span class="px-2 py-1 rounded text-sm" style="background-color: rgba(79, 70, 229, 0.2); color: var(--primary);">Mailparser</span>
+            </div>
+          </div>
+          <div class="glass-card p-4">
+            <h3 class="font-medium mb-2" style="color: var(--text-primary);" data-i18n="about_frontend_title">前端技术</h3>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-2 py-1 rounded text-sm" style="background-color: rgba(192, 38, 211, 0.2); color: var(--accent);">HTML/CSS/JavaScript</span>
+              <span class="px-2 py-1 rounded text-sm" style="background-color: rgba(192, 38, 211, 0.2); color: var(--accent);">TailwindCSS</span>
+              <span class="px-2 py-1 rounded text-sm" style="background-color: rgba(192, 38, 211, 0.2); color: var(--accent);">Font Awesome</span>
+              <span class="px-2 py-1 rounded text-sm" style="background-color: rgba(192, 38, 211, 0.2); color: var(--accent);">Socket.IO Client</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <h2 class="text-xl font-semibold mb-3" style="color: var(--text-primary);" data-i18n="about_usage_title">使用方式</h2>
+          <p class="mb-4" style="color: var(--text-secondary);" data-i18n="about_usage_intro">
+            MeteorMail 提供多种使用方式，即使不搭建自己的服务器，您也可以通过简单的域名配置来使用此服务。
+          </p>
+
+          <div class="glass-card p-4 mb-4">
+            <div class="flex items-center mb-2">
+              <i class="fa-solid fa-globe mr-2" style="color: var(--primary);"></i>
+              <h3 class="font-medium" style="color: var(--text-primary);" data-i18n="about_usage_a_title">域名 A 记录配置</h3>
+            </div>
+            <p class="text-sm mb-2" style="color: var(--text-secondary);" data-i18n="about_usage_a_desc">
+              通过设置域名的 A 记录指向我们的服务器 IP，您可以使用自己的域名访问 MeteorMail 服务：
+            </p>
+            <ol class="list-decimal list-inside text-sm space-y-1 ml-2" style="color: var(--text-secondary);">
+              <li data-i18n="about_usage_a_step1">登录您的域名管理面板</li>
+              <li data-i18n="about_usage_a_step2">添加一条 A 记录，将您的域名或子域名指向我们的服务器 IP</li>
+              <li data-i18n="about_usage_a_step3">等待 DNS 解析生效（通常需要几分钟到几小时）</li>
+              <li data-i18n="about_usage_a_step4">使用您的域名访问 MeteorMail 服务</li>
+            </ol>
+          </div>
+
+          <div class="glass-card p-4 mb-4">
+            <div class="flex items-center mb-2">
+              <i class="fa-solid fa-link mr-2" style="color: var(--primary);"></i>
+              <h3 class="font-medium" style="color: var(--text-primary);" data-i18n="about_usage_cname_title">域名 CNAME 记录配置</h3>
+            </div>
+            <p class="text-sm mb-2" style="color: var(--text-secondary);" data-i18n="about_usage_cname_desc">
+              如果您希望更灵活地使用服务，可以通过 CNAME 记录将您的域名指向我们的服务：
+            </p>
+            <ol class="list-decimal list-inside text-sm space-y-1 ml-2" style="color: var(--text-secondary);">
+              <li data-i18n="about_usage_cname_step1">登录您的域名管理面板</li>
+              <li data-i18n="about_usage_cname_step2">添加一条 CNAME 记录，将您的域名或子域名指向 <span class="font-mono bg-opacity-20 px-1 rounded" style="background-color: var(--code-bg); color: var(--primary);">meteormail.me</span></li>
+              <li data-i18n="about_usage_cname_step3">等待 DNS 解析生效（通常需要几分钟到几小时）</li>
+              <li data-i18n="about_usage_cname_step4">使用您的域名访问 MeteorMail 服务</li>
+            </ol>
+            <p class="text-sm mt-2" style="color: var(--text-secondary);" data-i18n="about_usage_cname_note">
+              <i class="fa-solid fa-circle-info mr-1" style="color: var(--primary);"></i>
+              使用 CNAME 方式时，您的邮箱地址将变为 <span class="font-mono">用户名@您的域名</span>，所有邮件将自动转发到我们的服务。
+            </p>
+          </div>
+
+
+        </div>
+
+        <div class="mb-8 glass-card p-6">
+          <h2 class="text-xl font-semibold mb-4" style="color: var(--text-primary);" data-i18n="about_author_title">关于作者</h2>
+          <div class="flex flex-col md:flex-row items-start justify-between gap-6">
+            <div class="w-full md:w-2/3" style="color: var(--text-secondary);">
+              <p class="mb-4" data-i18n="about_author_intro">MeteorMail 由 Ctrler 开发和维护。Ctrler 是一位热衷于开源项目的开发者，致力于创建简单实用的工具来解决实际问题。</p>
+              <p class="mb-4" data-i18n="about_author_wechat">欢迎关注作者的微信公众号「Ctrler」，获取更多技术分享和项目更新。</p>
+            </div>
+            <div class="flex-shrink-0 flex flex-col items-center">
+              <img src="wechat.png" alt="微信公众号二维码" class="w-32 h-32 rounded-md shadow-md mb-2" style="background-color: white;">
+              <p class="text-sm text-center" style="color: var(--text-tertiary);" data-i18n="about_author_wechat_account">微信公众号：Ctrler</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card p-6">
+          <h2 class="text-xl font-semibold mb-4" style="color: var(--text-primary);" data-i18n="about_opensource_title">开源与贡献</h2>
+          <p class="mb-4" style="color: var(--text-secondary);" data-i18n="about_opensource_desc">
+            MeteorMail 是一个开源项目，欢迎社区贡献代码、提出建议或报告问题。您可以在 GitHub 上找到我们的项目，参与贡献或部署自己的实例。
+          </p>
+          <div class="flex justify-center">
+            <a href="https://github.com/lbjlaq/MeteorMail" target="_blank" class="inline-flex items-center px-4 py-2 rounded-md transition-colors hover:opacity-90" style="background-color: var(--primary); color: white;">
+              <i class="fab fa-github mr-2"></i>
+              <span data-i18n="github_repo">GitHub 仓库</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="py-6 text-center text-xs sm:text-sm mt-auto w-full" style="color: var(--text-tertiary);">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <p data-i18n="footer_text">© 2025 MeteorMail - 如流星般短暂而绚丽的临时邮箱服务</p>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // 防止页面弹性滚动问题
+    document.body.addEventListener('touchmove', function(e) {
+      if (e.touches.length > 1) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    // 页面加载时执行
+    document.addEventListener('DOMContentLoaded', () => {
+      // 初始化语言设置
+      if (typeof setupLanguage === 'function') {
+        setupLanguage();
+      }
+    });
+  </script>
+</body>
+</html>

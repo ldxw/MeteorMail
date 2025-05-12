@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  meteormail:
+    build: .
+    container_name: meteormail
+    restart: always
+    ports:
+      - "80:80"
+      - "25:25"
+    volumes:
+      - ./config.json:/app/config.json
+      - ./.env:/app/.env
+      - ./logs:/app/logs
