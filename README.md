@@ -20,6 +20,18 @@ MeteorMail 是一个基于 Node.js 的自托管临时邮箱服务，如同流星
 
 [前往英文文档 (To English Documentation)](#english)
 
+## 更新日志
+
+### 2025-06-21 更新
+- **新增管理后台**：添加了带登录保护的管理页面
+  - 动态设置邮件保留时效
+  - 动态设置每个邮箱保留的邮件数量
+  - 设置禁用的邮箱前缀列表（如 `admin`, `root`）
+- **安全增强**：禁止使用特定前缀创建邮箱，防止敏感邮箱被滥用
+- **多语言支持**：管理界面支持中英文切换
+- **深色模式**：管理界面支持深色/浅色主题切换
+- **Docker 镜像升级**：支持 ARM64 和 AMD64 多平台架构
+
 ## 目录结构
 ```
 MeteorMail/
@@ -68,6 +80,10 @@ SMTP_PORT=25
 SMTP_HOST=0.0.0.0
 MAX_MAILS=50
 MAIL_EXPIRE_MINUTES=10
+ADMIN_USER=admin
+ADMIN_PASSWORD=password
+FORBIDDEN_PREFIXES=admin,root,support
+SESSION_SECRET=a_very_secret_key_that_should_be_changed
 ```
 
 ### 使用 config.json 配置
@@ -78,7 +94,11 @@ MAIL_EXPIRE_MINUTES=10
   "MAIL_EXPIRE_MINUTES": 10,    // 邮件保留时长（分钟）
   "PORT": 80,                   // Web服务端口
   "SMTP_PORT": 25,              // SMTP服务端口
-  "SMTP_HOST": "0.0.0.0"        // SMTP监听地址
+  "SMTP_HOST": "0.0.0.0",       // SMTP监听地址
+  "ADMIN_USER": "admin",        // 管理员用户名
+  "ADMIN_PASSWORD": "password", // 管理员密码
+  "FORBIDDEN_PREFIXES": ["admin", "root", "support"], // 禁用的邮箱前缀列表
+  "SESSION_SECRET": "a_very_secret_key_that_should_be_changed" // 会话密钥
 }
 ```
 
@@ -174,7 +194,11 @@ cat > ~/meteormail/config/config.json << EOF
   "SMTP_PORT": 25,
   "SMTP_HOST": "0.0.0.0",
   "MAX_MAILS": 50,
-  "MAIL_EXPIRE_MINUTES": 10
+  "MAIL_EXPIRE_MINUTES": 10,
+  "ADMIN_USER": "admin",
+  "ADMIN_PASSWORD": "your_secure_password",
+  "FORBIDDEN_PREFIXES": ["admin", "root", "support"],
+  "SESSION_SECRET": "your_very_secret_key_here"
 }
 EOF
 
@@ -229,10 +253,12 @@ docker run -d \
   -p 80:80 \
   -p 25:25 \
   -e PORT=80 \
+  -e ADMIN_USER=admin \
+  -e ADMIN_PASSWORD=your_secure_password \
   lbjlaq/meteormail:latest
 ```
 
-官方镜像已发布在 Docker Hub：[lbjlaq/meteormail](https://hub.docker.com/r/lbjlaq/meteormail)
+官方镜像已发布在 Docker Hub：[lbjlaq/meteormail](https://hub.docker.com/r/lbjlaq/meteormail)，支持 ARM64 和 AMD64 多平台架构。
 
 #### 修改 Docker 端口
 如果需要修改端口，请同时修改以下两个地方：
@@ -249,7 +275,7 @@ ports:
   - "2525:2525"
 ```
 
-或者使用 `docker run` 命令：
+Or using the `docker run` command:
 
 ```bash
 docker run -d \
@@ -262,22 +288,22 @@ docker run -d \
   lbjlaq/meteormail:latest
 ```
 
-同时在 `.env` 中：
+Meanwhile in `.env`:
 ```
 PORT=3000
 SMTP_PORT=25
 ```
 
-修改后重启容器：
+Restart the container after modifications:
 ```bash
-# 如果使用 docker-compose
+# If using docker-compose
 docker-compose down
 docker-compose up -d
 
-# 如果使用 docker run
+# If using docker run
 docker stop meteormail
 docker rm meteormail
-# 然后重新运行上面的 docker run 命令
+# Then re-run the docker run command above
 ```
 
 ---
@@ -294,6 +320,38 @@ http://localhost:80
 - 页面自动分配临时邮箱ID，可实时接收邮件
 - 支持刷新ID、自定义ID、复制邮箱地址、手动删除邮件
 - 访问 `/about.html` 查看项目介绍和技术架构
+
+## 管理后台使用说明
+
+### 访问管理后台
+浏览器访问：
+```
+http://localhost/login.html
+```
+
+使用您在配置文件中设置的管理员用户名和密码登录（默认为 admin/password）。
+
+### 管理后台功能
+
+登录后，您可以：
+
+1. **系统设置**
+   - 调整邮件保留时间（分钟）
+   - 设置每个邮箱最大保留邮件数量
+
+2. **安全设置**
+   - 管理禁用的邮箱前缀列表
+   - 每行输入一个前缀，如 `admin`、`root`、`support` 等
+
+3. **界面设置**
+   - 切换语言（中文/英文）
+   - 切换主题（深色/浅色模式）
+
+### 安全建议
+
+1. **修改默认凭据**：务必修改默认的管理员用户名和密码
+2. **设置强会话密钥**：修改 `SESSION_SECRET` 为一个复杂的随机字符串
+3. **禁用敏感前缀**：添加可能被滥用的邮箱前缀到禁用列表中
 
 ---
 
@@ -567,6 +625,10 @@ SMTP_PORT=25
 SMTP_HOST=0.0.0.0
 MAX_MAILS=50
 MAIL_EXPIRE_MINUTES=10
+ADMIN_USER=admin
+ADMIN_PASSWORD=password
+FORBIDDEN_PREFIXES=admin,root,support
+SESSION_SECRET=a_very_secret_key_that_should_be_changed
 ```
 
 ### Using config.json Configuration
@@ -577,214 +639,27 @@ If there is no .env file, the system will use the `config.json` file in the proj
   "MAIL_EXPIRE_MINUTES": 10,    // Email retention time (minutes)
   "PORT": 80,                   // Web service port
   "SMTP_PORT": 25,              // SMTP service port
-  "SMTP_HOST": "0.0.0.0"        // SMTP listening address
+  "SMTP_HOST": "0.0.0.0",       // SMTP listening address
+  "ADMIN_USER": "admin",        // Admin username
+  "ADMIN_PASSWORD": "password", // Admin password
+  "FORBIDDEN_PREFIXES": ["admin", "root", "support"], // List of forbidden email prefixes
+  "SESSION_SECRET": "a_very_secret_key_that_should_be_changed" // Session secret
 }
 ```
 
 > **Note**: If both .env and config.json files exist, configurations in .env will override those with the same name in config.json.
 
-## Acknowledgements | 鸣谢
-- [denghongcai/forsaken-mail](https://github.com/denghongcai/forsaken-mail) - 感谢forsaken-mail项目的启发 | Thanks to the forsaken-mail project for inspiration
+## Update Log
 
-如有问题请提交 issue 或联系开发者。
-
----
-
-## Installation and Startup
-
-### Method 1: Direct Installation
-```bash
-# Clone the repository
-git clone https://github.com/lbjlaq/MeteorMail.git
-cd MeteorMail
-
-# Install dependencies
-npm install
-
-# Start the service
-npm start
-```
-- After startup, the Web service listens on `http://localhost:80`
-- SMTP service listens on `SMTP_PORT` (default is 25)
-
-### Method 2: Docker Deployment (Recommended)
-The project provides complete Docker support and can be easily deployed in several ways:
-
-#### Option 1: Deploy using docker-compose
-
-```bash
-# Clone the repository
-git clone https://github.com/lbjlaq/MeteorMail.git
-cd MeteorMail
-
-# Build image and start service
-docker-compose up -d
-
-# Check container status
-docker ps
-
-# View logs
-docker logs -f meteormail
-```
-
-#### Option 2: Manually build image and deploy
-
-```bash
-# Clone the repository
-git clone https://github.com/lbjlaq/MeteorMail.git
-cd MeteorMail
-
-# Build image
-docker build -t meteormail:latest .
-
-# Run container
-docker run -d \
-  --name meteormail \
-  --restart=unless-stopped \
-  -p 80:80 \
-  -p 25:25 \
-  -v $(pwd)/config.json:/app/config.json \
-  -v $(pwd)/.env:/app/.env \
-  -v $(pwd)/logs:/app/logs \
-  -e PORT=80 \
-  meteormail:latest
-```
-
-#### Option 3: One-click run (no need to clone repository)
-
-You can deploy MeteorMail with the following one-click command:
-
-##### Simplest one-click deployment command
-
-```bash
-# Simplest one-click deployment (with default configuration)
-docker run -d --name meteormail --restart=unless-stopped -p 80:80 -p 25:25 lbjlaq/meteormail:latest
-```
-
-This command uses the default configuration in the image, suitable for quick testing or simple use cases.
-
-##### Deployment command with persistent storage and custom configuration
-
-If you need persistent storage and custom configuration, use the following command:
-
-```bash
-# Create configuration directory
-mkdir -p ~/meteormail/{config,logs}
-
-# Create configuration file
-cat > ~/meteormail/config/config.json << EOF
-{
-  "PORT": 80,
-  "SMTP_PORT": 25,
-  "SMTP_HOST": "0.0.0.0",
-  "MAX_MAILS": 50,
-  "MAIL_EXPIRE_MINUTES": 10
-}
-EOF
-
-# Run container
-docker run -d \
-  --name meteormail \
-  --restart=unless-stopped \
-  -p 80:80 \
-  -p 25:25 \
-  -v ~/meteormail/config:/app/config \
-  -v ~/meteormail/logs:/app/logs \
-  -e PORT=80 \
-  lbjlaq/meteormail:latest
-```
-
-#### Docker Configuration Notes
-- Default mapping of host ports 80 and 25 to the container
-- Configuration files mapped to the container via volume mounting
-- Log directory is persistently stored
-- Environment variables `PORT` and `SMTP_PORT` used to set service ports
-
-#### Domain Configuration
-
-You can point your domain to your MeteorMail service in several ways:
-
-1. **Using A Record**
-
-   Point your domain directly to your server's IP address:
-   ```
-   mail.yourdomain.com.  IN  A  123.456.789.10  # Your server IP
-   ```
-
-   When using an A record, the system will automatically use the domain as the suffix for the email address.
-
-2. **Using CNAME Record**
-
-   Point your domain to another domain:
-   ```
-   mail.yourdomain.com.  IN  CNAME  your-server.example.com.
-   ```
-
-   When using a CNAME record, the system will also automatically use the domain as the suffix for the email address.
-
-#### Using Official Docker Image
-
-You can run MeteorMail with one command on any system with Docker installed:
-
-```bash
-docker run -d \
-  --name meteormail \
-  --restart=unless-stopped \
-  -p 80:80 \
-  -p 25:25 \
-  -e PORT=80 \
-  lbjlaq/meteormail:latest
-```
-
-Official image is published on Docker Hub: [lbjlaq/meteormail](https://hub.docker.com/r/lbjlaq/meteormail)
-
-#### Modifying Docker Ports
-If you need to change ports, please modify both:
-
-1. Port configuration in `.env` or `config.json`
-2. Port mapping in `docker-compose.yml` or in the `docker run` command
-
-For example, to change the Web port to 3000 and SMTP port to 2525:
-
-```yaml
-# docker-compose.yml
-ports:
-  - "3000:3000"  # host port:container port
-  - "2525:2525"
-```
-
-Or using the `docker run` command:
-
-```bash
-docker run -d \
-  --name meteormail \
-  --restart=unless-stopped \
-  -p 3000:3000 \
-  -p 25:25 \
-  -e PORT=3000 \
-  -e SMTP_PORT=25 \
-  lbjlaq/meteormail:latest
-```
-
-Meanwhile in `.env`:
-```
-PORT=3000
-SMTP_PORT=25
-```
-
-Restart the container after modifications:
-```bash
-# If using docker-compose
-docker-compose down
-docker-compose up -d
-
-# If using docker run
-docker stop meteormail
-docker rm meteormail
-# Then re-run the docker run command above
-```
-
----
+### June 21, 2025 Update
+- **Added Admin Dashboard**: Added a login-protected admin page
+  - Dynamically set email retention time
+  - Dynamically set the number of emails retained per mailbox
+  - Configure a list of forbidden mailbox prefixes (e.g., `admin`, `root`)
+- **Security Enhancement**: Prevent the creation of mailboxes with specific prefixes to prevent abuse
+- **Multilingual Support**: Admin interface supports Chinese/English switching
+- **Dark Mode**: Admin interface supports dark/light theme switching
+- **Docker Image Upgrade**: Support for ARM64 and AMD64 multi-platform architectures
 
 ## Frontend Access
 Access via browser:
@@ -799,220 +674,37 @@ http://localhost:80
 - Supports refreshing ID, custom ID, copying email address, manual email deletion
 - Visit `/about.html` to view project introduction and technical architecture
 
----
+## Admin Dashboard Guide
 
-## Email Testing Methods
-
-### Testing with SMTP Service
-
-You can use any client or tool that supports SMTP protocol to send emails to your temporary mailbox. Here are some testing methods:
-
-### 1. Using the swaks command line tool to send test emails
-```bash
-swaks --to <mailboxID>@localhost --server 127.0.0.1:25 --from test@demo.com --header "Subject: Test Email" --body "Hello, this is a test email"
+### Accessing the Admin Dashboard
+Access via browser:
+```
+http://localhost/login.html
 ```
 
-### 2. Using telnet to manually test SMTP protocol
-```bash
-telnet localhost 25
-```
-Enter the following commands in sequence:
-```
-HELO localhost
-MAIL FROM:<test@demo.com>
-RCPT TO:<mailboxID@localhost>
-DATA
-Subject: Test Email
+Log in using the admin username and password set in your configuration file (default is admin/password).
 
-Hello, this is a test email
-.
-QUIT
-```
+### Admin Dashboard Features
 
-### 3. Using Email Clients
+After logging in, you can:
 
-You can also configure email clients (like Thunderbird, Outlook, etc.) to send emails:
-- SMTP server: localhost or your server IP
-- Port: 25
-- No authentication required
-- Recipient: <mailboxID>@localhost or <mailboxID>@your-domain
+1. **System Settings**
+   - Adjust email retention time (minutes)
+   - Set the maximum number of emails kept per mailbox
 
----
+2. **Security Settings**
+   - Manage the list of forbidden mailbox prefixes
+   - Enter one prefix per line, such as `admin`, `root`, `support`, etc.
 
-## API Documentation
+3. **Interface Settings**
+   - Switch language (Chinese/English)
+   - Switch theme (Dark/Light mode)
 
-Visit `/api.html` to view detailed API documentation and usage examples.
+### Security Recommendations
 
-### Get Mailbox Email List
-```
-GET /api/mails/:mailboxAddr
-```
-- `mailboxAddr` is the complete email address (like `zdugawlb@localhost`), needs URL encoding. For example:
-  - `GET /api/mails/zdugawlb%40localhost`
-- Returns:
-```json
-{
-  "mails": [
-    {
-      "to": "zdugawlb@localhost",
-      "from": "test@demo.com",
-      "subject": "Test Email",
-      "text": "Hello, this is a test email",
-      "html": "",
-      "date": "2025-04-15T12:02:26.000Z",
-      "attachments": [],
-      "raw": "..."
-    }
-  ]
-}
-```
-
-### Get Specific Email
-```
-GET /api/mails/:mailboxAddr/:idx
-```
-- `mailboxAddr` is the complete email address (like `zdugawlb@localhost`), needs URL encoding
-- `idx` is the index of the email in the list (starting from 0)
-- For example: `GET /api/mails/zdugawlb%40localhost/0`
-- Successful return:
-```json
-{
-  "mail": {
-    "to": "zdugawlb@localhost",
-    "from": "test@demo.com",
-    "subject": "Test Email",
-    "text": "Hello, this is a test email",
-    "html": "",
-    "date": "2025-04-15T12:02:26.000Z",
-    "attachments": [],
-    "raw": "..."
-  }
-}
-```
-- If email doesn't exist or has expired, returns 404:
-```json
-{
-  "error": "Email does not exist or has expired"
-}
-```
-
-### Delete Specific Email
-```
-DELETE /api/mails/:mailboxAddr/:idx
-```
-- `mailboxAddr` is the complete email address (like `zdugawlb@localhost`), needs URL encoding. For example:
-  - `DELETE /api/mails/zdugawlb%40localhost/0`
-- `idx` is the index of the email in the list (starting from 0)
-- Returns:
-```json
-{ "success": true }
-```
-
----
-
-## Email Auto-Expiration
-- Each email is only kept for `MAIL_EXPIRE_MINUTES` minutes, automatically deleted after timeout
-- Only the most recent `MAX_MAILS` emails are kept
-
----
-
-## Common Issues and Solutions
-
-### Cannot Access Frontend Page
-- **Issue**: Browser shows "Can't access this site", displays "ERR_CONNECTION_REFUSED" error
-- **Solution**:
-  1. Ensure the service is running, check if the port is occupied `netstat -an | grep LISTEN | grep 80`
-  2. Modify Helmet security policy, relax CSP restrictions, allow external resources to load
-  3. Ensure front-end resource paths are correct, replace with absolute paths `/socket.io.min.js` instead of `socket.io.min.js`
-
-### Cannot Access Docker Container
-- **Issue**: Docker container started successfully, but cannot be accessed through browser
-- **Solution**:
-  1. Confirm port mapping is correct - check port mapping with `docker ps`
-  2. Check container logs with `docker logs meteormail` to confirm service started properly
-  3. Try using the `curl` command to test connection `curl -I http://localhost`
-  4. Ensure port configuration is correct, e.g. `-e PORT=80`
-
-### Docker Image Build Failure
-- **Issue**: Error occurs when building Docker image
-- **Solution**:
-  1. Ensure Dockerfile exists and its content is correct
-  2. Check .dockerignore file, ensure it doesn't include necessary files
-  3. Try cleaning Docker cache `docker builder prune`
-  4. View detailed build logs `docker build --no-cache -t meteormail .`
-
-### Port 25 Permission Issues
-- **Issue**: Using port 25 requires root privileges
-- **Solution**:
-  1. Run the application with sudo `sudo npm start`
-  2. Or use authbind to allow non-root users to bind privileged ports `authbind --deep npm start`
-  3. On Linux systems, you can use the `setcap` command to grant Node.js the ability to bind privileged ports
-  4. When using Docker, ensure correct port mapping `-p 25:25`
-
-### Dependency Package Version Incompatibility
-- **Issue**: npm install reports errors, some package versions don't exist or are incompatible
-- **Solution**:
-  1. Modify package.json file, adjust package versions to available versions
-  2. Use mailparser `^3.7.2` instead of `^3.10.0`
-  3. Use nanoid `^4.0.1` instead of `^4.0.2`
-  4. Using Docker deployment can avoid this problem
-
-### Socket.IO Connection Issues
-- **Issue**: Frontend cannot receive emails in real-time via WebSocket
-- **Solution**:
-  1. Ensure socket.io.min.js file exists in the public directory
-  2. Relax CSP security policy, allow WebSocket connections `connectSrc: ["'self'", "wss:", "ws:", "https:", "http:"]`
-  3. Check browser console for connection errors
-  4. When using Docker, ensure correct port mapping
-
-### Emails Not Displaying in Frontend Interface
-- **Issue**: Email sent successfully but doesn't display in the frontend interface
-- **Solution**:
-  1. Use API to check if email was saved `curl http://localhost/api/mails/<mailboxID>%40localhost`
-  2. Check server logs to confirm email was successfully saved `Email saved: Test Email`
-  3. Refresh the frontend page, reestablish WebSocket connection
-
-### Docker Data Persistence Issues
-- **Issue**: Data lost after Docker container restart
-- **Solution**:
-  1. Ensure volumes are correctly mounted `-v $(pwd)/logs:/app/logs -v $(pwd)/config:/app/config`
-  2. Check mounted directory permissions
-  3. Use Docker volumes instead of bind mounts `docker volume create meteormail-data`
-
----
-
-## Production Environment Recommendations
-- In production environment, set `SMTP_PORT` to 25, requires root privileges and disabling system SMTP service
-- Adding firewall restrictions is recommended to prevent abuse
-- Enable HTTPS when deploying to public network to ensure email security
-- When exposing to public, it's recommended to only allow specified domains to access, preventing abuse
-
----
-
-## Project Structure Description
-- **src/server.js**: Main entry file, starts HTTP service and SMTP service
-- **src/app.js**: Express application, provides Web service and API interfaces
-- **src/config.js**: Configuration loading module, handles .env and config.json configurations
-- **src/smtp.js**: SMTP server, receives and processes emails
-- **src/mailstore.js**: Email storage management, responsible for saving, retrieving, and deleting emails
-- **src/mailbox.js**: Mailbox ID management, handles creation and mapping of temporary mailboxes
-- **public/**: Frontend static files, contains HTML, JavaScript, and styles
-  - **public/index.html**: Main page, provides temporary mailbox functionality
-  - **public/about.html**: About page, displays project introduction and technical architecture
-  - **public/api.html**: API documentation page, detailed API usage instructions (access path: /api.html)
-  - **public/diagnostic.html**: System diagnostic tool, for development and debugging
-
----
-
-## Contact and Contribution
-- If you have any issues or suggestions, please open an issue on [GitHub Issues](https://github.com/lbjlaq/MeteorMail/issues)
-- Contributions are welcome via pull requests
-- Official WeChat Public Account: Ctrler
-
-## Contact and Contribution
-- If you have any issues or suggestions, please open an issue on [GitHub Issues](https://github.com/lbjlaq/MeteorMail/issues)
-- Contributions are welcome via pull requests
-- Official WeChat Public Account: Ctrler
+1. **Change Default Credentials**: Be sure to change the default admin username and password
+2. **Set a Strong Session Key**: Modify `SESSION_SECRET` to a complex random string
+3. **Disable Sensitive Prefixes**: Add potentially abusable mailbox prefixes to the forbidden list
 
 ## Acknowledgements | 鸣谢
 - [denghongcai/forsaken-mail](https://github.com/denghongcai/forsaken-mail) - Thanks to the forsaken-mail project for inspiration

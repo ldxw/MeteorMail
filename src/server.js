@@ -30,9 +30,12 @@ io.on('connection', (socket) => {
 
   // 设置自定义邮箱ID
   socket.on('set mailbox', (id) => {
-    mailbox.setMailbox(id, socket);
-    socket.mailboxId = id;
-    socket.emit('mailbox', id);
+    const success = mailbox.setMailbox(id, socket);
+    if (success) {
+      socket.mailboxId = id;
+      // 注意：mailbox.setMailbox 已经发送了 mailbox 事件，这里不需要重复发送
+    }
+    // 如果失败，mailbox.setMailbox 已经发送了错误消息
   });
 
   // 断开连接时注销邮箱

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理后台 - MeteorMail</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/meteormail.css">
+</head>
+<body class="galaxy-bg text-gray-100 antialiased">
+  <div id="stars-container"></div>
+
+  <!-- 页面容器 -->
+  <div class="min-h-screen flex flex-col relative z-10">
+    <!-- 顶部导航 -->
+    <header class="sticky top-0 z-30 backdrop-filter backdrop-blur-lg w-full" style="background: var(--header-bg); border-bottom: 1px solid var(--header-border);">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="flex justify-between items-center py-3 md:py-4">
+          <div class="flex items-center">
+            <a href="/" class="flex items-center" aria-label="MeteorMail">
+              <svg class="w-8 h-8 md:w-10 md:h-10" style="color: var(--primary);" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2"/><path d="M18 7L14 14L8 9L6 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span class="ml-2 text-xl md:text-2xl font-bold brand-font" style="color: var(--text-primary);" data-i18n="admin_title">MeteorMail - 管理后台</span>
+            </a>
+          </div>
+          <nav class="flex items-center space-x-2">
+            <button id="langToggle" class="p-2 rounded-full transition focus:outline-none hover:opacity-80" style="background-color: var(--button-bg);" aria-label="切换语言" title="切换语言">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" style="color: var(--button-text);" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7 2a1 1 0 011 1v1h3a1 1 0 110 2H9.578a18.87 18.87 0 01-1.724 4.78c.29.354.596.696.914 1.026a1 1 0 11-1.44 1.389 16.87 16.87 0 01-.554-.514 19.05 19.05 0 01-3.107 3.567 1 1 0 01-1.334-1.49 17.054 17.054 0 003.07-3.293 18.013 18.013 0 01-1.487-2.594 1 1 0 111.79-.894c.234.47.489.928.764 1.372.417-.934.752-1.913.997-2.927H3a1 1 0 110-2h3V3a1 1 0 011-1zm6 6a1 1 0 01.894.553l2.991 5.982a.869.869 0 01.02.037l.99 1.98a1 1 0 11-1.79.895L15.383 16h-4.764l-.724 1.447a1 1 0 11-1.788-.894l.99-1.98.019-.038 2.99-5.982A1 1 0 0113 8zm-1.382 6h2.764L13 11.236 11.618 14z" clip-rule="evenodd" /></svg>
+            </button>
+            <button id="darkToggle" class="p-2 rounded-full transition focus:outline-none hover:opacity-80" style="background-color: var(--button-bg);" aria-label="切换深色模式" title="切换深色模式">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" style="color: var(--button-text);" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" /></svg>
+            </button>
+            <a href="/admin/logout" class="font-medium px-3 py-2 rounded-md transition hover:bg-opacity-20 hover:bg-indigo-600" style="color: var(--text-secondary);" data-i18n="logout">登出</a>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-10">
+        <div class="flex flex-col md:flex-row gap-8">
+            <!-- 左侧菜单 -->
+            <aside class="w-full md:w-1/4">
+                <div class="glass-card p-4">
+                    <nav class="space-y-1">
+                        <a href="#general" class="admin-menu-item active-menu flex items-center px-3 py-2 text-sm font-medium rounded-md">
+                            <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            <span data-i18n="general_settings">常规设置</span>
+                        </a>
+                        <a href="#security" class="admin-menu-item flex items-center px-3 py-2 text-sm font-medium rounded-md">
+                           <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                           <span data-i18n="security_settings">安全设置</span>
+                        </a>
+                        <a href="#account" class="admin-menu-item flex items-center px-3 py-2 text-sm font-medium rounded-md">
+                            <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            <span data-i18n="account_settings">账户设置</span>
+                        </a>
+                    </nav>
+                </div>
+            </aside>
+            
+            <!-- 右侧内容 -->
+            <div class="w-full md:w-3/4">
+                <form id="admin-form">
+                    <!-- 常规设置卡片 -->
+                    <div id="general" class="admin-content-card glass-card p-6 sm:p-8">
+                        <h2 class="text-xl font-bold mb-6" style="color: var(--text-primary);" data-i18n="general_settings">常规设置</h2>
+                        <div class="space-y-6">
+                            <div>
+                                <label for="mailExpireMinutes" class="block text-sm font-medium" style="color: var(--text-secondary);" data-i18n="email_retention_duration">邮件保留时长 (分钟)</label>
+                                <input type="number" id="mailExpireMinutes" name="mailExpireMinutes" class="mt-1 block w-full md:w-1/2 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text);">
+                            </div>
+                            <div>
+                                <label for="maxMails" class="block text-sm font-medium" style="color: var(--text-secondary);" data-i18n="max_emails_per_mailbox">邮箱最大邮件数</label>
+                                <input type="number" id="maxMails" name="maxMails" class="mt-1 block w-full md:w-1/2 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text);">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 安全设置卡片 -->
+                    <div id="security" class="admin-content-card glass-card p-6 sm:p-8 hidden">
+                        <h2 class="text-xl font-bold mb-6" style="color: var(--text-primary);" data-i18n="security_settings">安全设置</h2>
+                        <div>
+                            <label for="forbiddenPrefixes" class="block text-sm font-medium" style="color: var(--text-secondary);" data-i18n="forbidden_prefixes_label">禁用邮箱前缀 (每行一个)</label>
+                            <textarea id="forbiddenPrefixes" name="forbiddenPrefixes" rows="8" class="mt-1 block w-full px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text);"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 账户设置卡片 -->
+                    <div id="account" class="admin-content-card glass-card p-6 sm:p-8 hidden">
+                        <h2 class="text-xl font-bold mb-6" style="color: var(--text-primary);" data-i18n="account_settings">账户设置</h2>
+                        <div class="space-y-6">
+                            <div>
+                                <label for="adminUser" class="block text-sm font-medium" style="color: var(--text-secondary);" data-i18n="admin_username_label">管理员用户名</label>
+                                <input type="text" id="adminUser" name="adminUser" class="mt-1 block w-full md:w-1/2 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text);">
+                            </div>
+                            <div>
+                                <label for="adminPassword" class="block text-sm font-medium" style="color: var(--text-secondary);" data-i18n="new_password_label">新密码 (留空则不修改)</label>
+                                <input type="password" id="adminPassword" name="adminPassword" placeholder="输入新密码" data-i18n-placeholder="new_password_placeholder" class="mt-1 block w-full md:w-1/2 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text);">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 text-right">
+                        <button type="submit" class="px-6 py-3 rounded-xl font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 hover:opacity-90" style="background-color: var(--primary); color: white;" data-i18n="save_all_settings">
+                          保存所有设置
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+  </div>
+  
+  <div id="alert-banner" class="hidden fixed top-24 right-10 z-50 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg"></div>
+
+  <script src="/js/translations.js"></script>
+  <script src="/js/meteor-effects.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html> 

@@ -8,11 +8,15 @@ const dotenv = require('dotenv');
 
 // 默认配置
 const defaultConfig = {
-  PORT: 3000,
+  PORT: 80,
   SMTP_PORT: 25,
   SMTP_HOST: '0.0.0.0',
   MAX_MAILS: 50,
-  MAIL_EXPIRE_MINUTES: 10
+  MAIL_EXPIRE_MINUTES: 10,
+  ADMIN_USER: 'admin',
+  ADMIN_PASSWORD: 'password',
+  FORBIDDEN_PREFIXES: ['admin', 'root', 'support', 'test'],
+  SESSION_SECRET: 'a_very_secret_key_that_should_be_changed'
 };
 
 // 尝试加载 .env 文件
@@ -71,6 +75,29 @@ config.getDomain = function() {
 // 获取当前域名
 config.getCurrentDomain = function() {
   return this.getDomain();
+};
+
+// 新增：持久化配置的函数
+config.updateConfig = function(newConfig) {
+  // 更新内存中的配置
+  Object.assign(config, newConfig);
+
+  // 准备要写入文件的数据（排除函数）
+  const configToSave = { ...config };
+  delete configToSave.getDomain;
+  delete configToSave.getCurrentDomain;
+  delete configToSave.updateConfig;
+
+  // 写回 config.json
+  const configPath = path.join(__dirname, '../config.json');
+  try {
+    fs.writeFileSync(configPath, JSON.stringify(configToSave, null, 2));
+    console.log('配置已更新并保存到 config.json');
+    return true;
+  } catch (err) {
+    console.error('保存配置到 config.json 失败:', err);
+    return false;
+  }
 };
 
 module.exports = config;

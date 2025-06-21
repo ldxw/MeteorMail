@@ -164,6 +164,19 @@
         </div>
 
         <div class="mb-8">
+          <h2 class="text-xl font-semibold mb-3" style="color: var(--text-primary);" data-i18n="api_restrictions">使用限制</h2>
+          <div style="color: var(--text-secondary);">
+            <p class="mb-2" data-i18n="api_forbidden_prefixes_desc">系统禁止使用某些特定的邮箱前缀，如 "admin"、"root" 等。如果尝试通过API访问这些前缀的邮箱，将收到 403 Forbidden 错误。</p>
+            <h4 class="font-medium mt-4 mb-2" style="color: var(--text-primary);" data-i18n="api_forbidden_example">禁用前缀错误示例</h4>
+            <pre data-allow-scroll="true"><code class="json-example">{
+  "error": "不允许使用该邮箱前缀",
+  "code": "forbidden_prefix"
+}</code></pre>
+            <p class="mt-2" data-i18n="api_forbidden_note">注意：错误消息会根据请求头中的 Accept-Language 返回中文或英文。</p>
+          </div>
+        </div>
+
+        <div class="mb-8">
           <h2 class="text-xl font-semibold mb-3" style="color: var(--text-primary);" data-i18n="api_base_url">基础 URL</h2>
           <div style="color: var(--text-secondary);">
             <p class="mb-2" data-i18n="api_base_url_desc">所有 API 请求都使用以下基础 URL：</p>

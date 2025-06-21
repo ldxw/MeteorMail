@@ -117,6 +117,13 @@ const translations = {
     'api_overview': 'API 概述',
     'api_overview_desc1': 'MeteorMail 提供了一组简单的 RESTful API，允许您以编程方式访问 MeteorMail 服务。这些 API 可以用于查询邮件列表、获取特定邮件内容或删除邮件。',
     'api_overview_desc2': '所有 API 返回 JSON 格式的数据，使用标准 HTTP 状态码表示请求结果。',
+    
+    // API 使用限制
+    'api_restrictions': '使用限制',
+    'api_forbidden_prefixes_desc': '系统禁止使用某些特定的邮箱前缀，如 "admin"、"root" 等。如果尝试通过API访问这些前缀的邮箱，将收到 403 Forbidden 错误。',
+    'api_forbidden_example': '禁用前缀错误示例',
+    'api_forbidden_note': '注意：错误消息会根据请求头中的 Accept-Language 返回中文或英文。',
+    
     'api_base_url': '基础 URL',
     'api_base_url_desc': '所有 API 请求都使用以下基础 URL：',
     'api_base_url_example': '例如：',
@@ -157,7 +164,27 @@ const translations = {
     'footer_text': '© 2025 MeteorMail - 如流星般短暂而绚丽的邮箱服务',
 
     // 复制成功提示
-    'copied': '已复制!'
+    'copied': '已复制!',
+
+    // 错误消息
+    'forbidden_prefix': '不允许使用该邮箱前缀',
+    'login_error': '用户名或密码错误。',
+    'admin_login': '管理员登录',
+    'admin_title': 'MeteorMail - 管理后台',
+    'username': '用户名',
+    'password': '密码',
+    'login_button': '登录',
+    'general_settings': '常规设置',
+    'security_settings': '安全设置',
+    'account_settings': '账户设置',
+    'email_retention_duration': '邮件保留时长 (分钟)',
+    'max_emails_per_mailbox': '邮箱最大邮件数',
+    'forbidden_prefixes_label': '禁用邮箱前缀 (每行一个)',
+    'admin_username_label': '管理员用户名',
+    'new_password_label': '新密码 (留空则不修改)',
+    'new_password_placeholder': '输入新密码',
+    'save_all_settings': '保存所有设置',
+    'logout': '登出'
   },
   'en': {
     // Navigation
@@ -271,8 +298,15 @@ const translations = {
     // API page
     'api_doc_title': 'MeteorMail API Documentation',
     'api_overview': 'API Overview',
-    'api_overview_desc1': 'MeteorMail provides a set of simple RESTful APIs that allow you to programmatically access the MeteorMail service. These APIs can be used to query email lists, get specific email content, or delete emails.',
+    'api_overview_desc1': 'MeteorMail provides a simple set of RESTful APIs that allow you to programmatically access the MeteorMail service. These APIs can be used to query mail lists, get specific mail content, or delete mails.',
     'api_overview_desc2': 'All APIs return data in JSON format and use standard HTTP status codes to indicate request results.',
+    
+    // API restrictions
+    'api_restrictions': 'Usage Restrictions',
+    'api_forbidden_prefixes_desc': 'The system prohibits the use of certain mailbox prefixes, such as "admin", "root", etc. If you attempt to access mailboxes with these prefixes via API, you will receive a 403 Forbidden error.',
+    'api_forbidden_example': 'Forbidden Prefix Error Example',
+    'api_forbidden_note': 'Note: Error messages will be returned in Chinese or English based on the Accept-Language header in the request.',
+    
     'api_base_url': 'Base URL',
     'api_base_url_desc': 'All API requests use the following base URL:',
     'api_base_url_example': 'For example:',
@@ -310,12 +344,35 @@ const translations = {
     'execution_error': '❌ Execution error: ',
 
     // Footer
-    'footer_text': '© 2025 MeteorMail - Email service, brilliant and fleeting like a meteor',
+    'footer_text': '© 2025 MeteorMail - A brilliant and fleeting email service',
 
     // Copy success message
-    'copied': 'Copied!'
+    'copied': 'Copied!',
+
+    // Error messages
+    'forbidden_prefix': 'This mailbox prefix is not allowed',
+    'login_error': 'Invalid username or password.',
+    'admin_login': 'Admin Login',
+    'admin_title': 'MeteorMail - Admin Panel',
+    'username': 'Username',
+    'password': 'Password',
+    'login_button': 'Login',
+    'general_settings': 'General Settings',
+    'security_settings': 'Security Settings',
+    'account_settings': 'Account Settings',
+    'email_retention_duration': 'Email Retention (minutes)',
+    'max_emails_per_mailbox': 'Max Mails per Mailbox',
+    'forbidden_prefixes_label': 'Forbidden Prefixes (one per line)',
+    'admin_username_label': 'Admin Username',
+    'new_password_label': 'New Password (leave blank to keep current)',
+    'new_password_placeholder': 'Enter new password',
+    'save_all_settings': 'Save All Settings',
+    'logout': 'Logout'
   }
 };
+
+// 确保翻译对象在全局范围内可用
+window.translations = translations;
 
 // 语言切换功能
 function setupLanguage() {

@@ -345,6 +345,8 @@
     function setupCustomModal() {
       const customBtn = document.getElementById('customBtn');
       let customModal;
+      // 跟踪上次成功的邮箱ID
+      let lastSuccessfulMailboxId = localStorage.getItem('mailboxId') || '';
 
       customBtn.addEventListener('click', () => {
         // 每次点击都重新创建模态框，确保使用最新的语言设置
@@ -375,10 +377,36 @@
 
           // 发送到socket
           window.socket.emit('set mailbox', val.toLowerCase());
-          customModal.classList.add('hidden');
-
-          // 提示复制已完成
-          const copyBtn = document.getElementById('copyBtn');
+          
+          // 注册一个一次性事件监听器，检查是否设置成功
+          const checkSuccess = (id) => {
+            // 如果收到新的邮箱ID，说明设置成功
+            lastSuccessfulMailboxId = id;
+            window.socket.off('mailbox', checkSuccess); // 移除监听器
+            customModal.classList.add('hidden'); // 关闭模态框
+          };
+          
+          // 注册一次性错误监听器
+          const checkError = (errorMsg) => {
+            // 获取当前语言
+            const lang = localStorage.getItem('language') || 'zh-CN';
+            const trans = translations[lang] || translations['zh-CN'];
+            
+            // 根据错误代码获取翻译文本
+            let displayError = errorMsg;
+            if (errorMsg === 'forbidden_prefix') {
+              displayError = trans.forbidden_prefix || '不允许使用该邮箱前缀';
+            }
+            
+            // 如果收到错误，保留模态框打开状态，显示错误消息
+            customError.textContent = displayError;
+            customError.classList.remove('hidden');
+            window.socket.off('mailbox_error', checkError); // 移除监听器
+          };
+          
+          // 添加临时事件监听器
+          window.socket.once('mailbox', checkSuccess);
+          window.socket.once('mailbox_error', checkError);
         };
 
         customCancel.onclick = () => {

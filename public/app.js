@@ -207,6 +207,83 @@ socket.on('mailbox', id => {
   fetchMailList();
 });
 
+socket.on('mailbox_error', message => {
+  // 如果自定义邮箱模态框已打开，在其中显示错误
+  const customModal = document.getElementById('customModal');
+  const customError = document.getElementById('customError');
+  
+  // 恢复之前的邮箱ID（如果有）
+  const previousId = localStorage.getItem('mailboxId');
+  if (previousId) {
+    // 恢复之前的邮箱ID
+    currentMailboxId = previousId;
+    // 更新显示
+    const domain = typeof getEmailDomain === 'function' ? getEmailDomain() : location.hostname;
+    mailboxInput.value = previousId + '@' + domain;
+  }
+  
+  // 获取当前语言
+  const lang = localStorage.getItem('language') || 'zh-CN';
+  
+  // 根据错误代码获取翻译文本
+  let errorMessage = message;
+  
+  // 检查是否存在全局 translations 对象
+  if (window.translations && window.translations[lang]) {
+    // 如果错误消息是一个键名，尝试从翻译中获取
+    if (window.translations[lang][message]) {
+      errorMessage = window.translations[lang][message];
+    }
+  } else {
+    // 如果没有找到翻译，使用默认错误消息
+    if (message === 'forbidden_prefix') {
+      errorMessage = lang === 'en' ? 
+        'This mailbox prefix is not allowed' : 
+        '不允许使用该邮箱前缀';
+    }
+  }
+  
+  if (customModal && customModal.style.display !== 'none' && !customModal.classList.contains('hidden') && customError) {
+    // 在模态框中显示错误
+    customError.textContent = errorMessage;
+    customError.classList.remove('hidden');
+  } else {
+    // 创建一个临时的错误提示
+    showFloatingError(errorMessage);
+  }
+});
+
+// 显示浮动错误提示
+function showFloatingError(message) {
+  // 检查是否已存在错误提示
+  let errorAlert = document.getElementById('floating-error');
+  if (!errorAlert) {
+    errorAlert = document.createElement('div');
+    errorAlert.id = 'floating-error';
+    errorAlert.className = 'fixed top-24 right-10 z-50 bg-red-500 text-white py-2 px-4 rounded-lg shadow-lg transition-opacity duration-300';
+    errorAlert.style.opacity = '0';
+    document.body.appendChild(errorAlert);
+  }
+  
+  // 设置错误消息
+  errorAlert.textContent = message;
+  
+  // 显示错误提示
+  setTimeout(() => {
+    errorAlert.style.opacity = '1';
+  }, 10);
+  
+  // 3秒后隐藏
+  setTimeout(() => {
+    errorAlert.style.opacity = '0';
+    setTimeout(() => {
+      if (errorAlert.parentNode) {
+        errorAlert.parentNode.removeChild(errorAlert);
+      }
+    }, 300);
+  }, 3000);
+}
+
 socket.on('mail', mail => {
   mailList.unshift(mail);
   if (mailList.length > 50) mailList.length = 50;
