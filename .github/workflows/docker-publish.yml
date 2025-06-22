@@ -40,18 +40,3 @@ jobs:
             -t ghcr.io/${{ github.repository_owner }}/meteormail:latest \
             -t ghcr.io/${{ github.repository_owner }}/meteormail:${{ steps.timestamp.outputs.tag }} \
             . --push
-
-      - name: Push README.md to Docker Hub
-        env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
-          DOCKERHUB_REPO: ldxw/meteormail
-        run: |
-          # 获取 Docker Hub API 的 token
-          TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d '{"username": "'"$DOCKERHUB_USERNAME"'", "password": "'"$DOCKERHUB_PASSWORD"'"}' https://hub.docker.com/v2/users/login/ | jq -r .token)
-
-          # 读取 README.md 文件内容
-          README=$(cat README.md)
-
-          # 更新 Docker Hub 仓库的描述
-          curl -s -o /dev/null -w "%{http_code}\n" -H "Authorization: JWT $TOKEN" -H "Content-Type: application/json" -X PATCH -d '{"full_description": "'"${README//$'\n'/\\n}"'"}' "https://hub.docker.com/v2/repositories/$DOCKERHUB_REPO/"
