@@ -28,13 +28,15 @@ jobs:
 
       - name: Generate timestamp tag
         id: timestamp
-        run: echo "::set-output name=tag::$(date +'%Y%m%d%H%M%S')"
+        run: |
+          TAG=$(date +'%Y%m%d%H%M%S')
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
 
       - name: Build Docker image for amd64 and arm64
         run: |
           docker buildx build --platform linux/amd64,linux/arm64 \
             -t ldxw/meteormail:latest \
             -t ldxw/meteormail:${{ steps.timestamp.outputs.tag }} \
-            -t ghcr.io/${{ github.repository }}/meteormail:latest \
-            -t ghcr.io/${{ github.repository }}/meteormail:${{ steps.timestamp.outputs.tag }} \
+            -t ghcr.io/${{ github.repository_owner }}/meteormail:latest \
+            -t ghcr.io/${{ github.repository_owner }}/meteormail:${{ steps.timestamp.outputs.tag }} \
             . --push
