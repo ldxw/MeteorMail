@@ -58,6 +58,11 @@ const config = {
   }
 });
 
+// 确保 FORBIDDEN_PREFIXES 是一个数组
+if (config.FORBIDDEN_PREFIXES && typeof config.FORBIDDEN_PREFIXES === 'string') {
+  config.FORBIDDEN_PREFIXES = config.FORBIDDEN_PREFIXES.split(',').map(p => p.trim());
+}
+
 // 简化域名处理，不再依赖反向代理
 config.getDomain = function() {
   // 直接使用配置中的BASE_URL或默认为localhost
