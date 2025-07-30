@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: '选择要构建的分支 main or modify'
+        description: '选择要构建的分支'
         required: true
-        default: 'main'
+        default: 'modify'
         type: string
 
 jobs:
